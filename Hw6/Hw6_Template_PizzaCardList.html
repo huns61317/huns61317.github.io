@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hw6_Template_PizzaCardList</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <style>
+        .card {
+            border: 1px solid black;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .headshot {
+            overflow: hidden;
+        }
+
+        .card-title {
+            color: white;
+            background-color: black;
+            display: inline-block;
+            border-radius: 5px;
+            padding: 5px 15px 5px 15px;
+        }
+
+        .card-body {
+            background-color: #ffbf67;
+        }
+
+        .card:hover {
+            box-shadow: 8px 8px 15px #808080;
+            transform: translate(5px, 5px);
+        }
+
+        .card:hover img {
+            transform: scale(1.2);
+            transition: transform 0.5s;
+        }
+
+        .card:not(:hover) img {
+            transform: scale(1, 1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover .card-body {
+            background-color: lightgreen !important;
+        }
+
+        .card:hover .card-title {
+            color: black;
+            background-color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='container-fluid'>
+        <div class='jumbotron bg-info'>
+            <h1>Pizza Card Template</h1>
+        </div>
+
+        <div class='row'>
+
+        </div>
+    </div>
+
+
+    <!-- 點擊按鈕後，出現視窗的樣式 -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <img id="pizzaImage">
+                    <h1 id="description" class="text-primary"></h1>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- step2: 建立 Card TempLate 樣板 -->
+    <template id='cardPizza'>
+        <div class="card" style="width: 18rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title"></h5>
+                <p class="card-text"></p>
+                <a href="#" class="btn btn-primary">詳細內容</a>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+
+    <script type='module'>
+
+        // 匯入模組($g => 選到)
+        import { $g } from './modules/helpers.js';
+
+        // Pseudo code 虛擬碼
+        // 1.準備好 Pizza 資料陣列
+        // 2.建立 Card TempLate 樣板
+        // 3.複製 Card 樣板，並設定資料
+        // 4.將複製的 Card 加入 DOM 中
+
+        let row = $g(".row");
+        window.onload = function () {
+            requestJSON();
+        };
+
+        // step1: 準備好 Pizza 資料陣列
+        const url = "https://raw.githubusercontent.com/huns61317/JSON/main/JSON_Pizza.json";  // pizza 資料的網址
+        let pizzaArray = [];  // 用來裝 pizza 的資料
+        let xhr = new XMLHttpRequest();
+
+        function requestJSON() {
+            xhr.onload = function () {  // 匿名
+                pizzaArray = JSON.parse(this.responseText);  // 回傳資料
+                console.log(pizzaArray);
+
+                // 用 迭代 顯示每一筆資料
+                pizzaArray.forEach((item, index) => {
+                    let card = $g("#cardPizza");  // 選到 card 樣板
+
+                    // step3: 複製 Card 樣板，並設定資料
+                    let cloneContent = card.content.cloneNode(true);  // 做 複製節點(卡片)
+                    
+                    cloneContent.querySelector("img").src = item.imageurl;  // 設定 card 樣板的 圖片
+                    cloneContent.querySelector("h5").innerText = item.name;  // 設定 card 樣板的 文字
+
+                    // 按 "詳細內容"
+                    cloneContent.querySelector(".btn").addEventListener("click", function () {
+                        this.setAttribute("data-toggle", "modal");  // 設定屬性(動態產生) data-toggle = "modal" 對應 class
+                        this.setAttribute("data-target", "#exampleModal");  // 設定屬性(動態產生) data-target = "#exampleModal" 對應 id
+
+                        // 按 "詳細內容" 按鈕後出現的視窗樣式
+                        let modal = $g("#exampleModal");
+                        modal.querySelector("h5").innerText = item.name;  // 標題
+                        modal.querySelector("#pizzaImage").src = item.imageurl;  // 圖片
+                        modal.querySelector("#description").innerText = item.name;  // 說明
+
+                    });
+
+                    // step4: 將複製的 Card 加入 DOM 中
+                    row.append(cloneContent);  // 把 複製並設定 好的東西，加到 row 裡面去
+                });
+            }
+
+            xhr.open("GET", url);  // 請求資料
+            xhr.send();  // 送出非同步請求
+        }
+
+    </script>
+</body>
+
+</html>
